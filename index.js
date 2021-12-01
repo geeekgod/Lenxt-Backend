@@ -47,3 +47,7 @@ app.get("/", (req, res) => {
 
 // auth Routes
 // app.use("/auth", authRouter);
+
+app.get("/test", (req, res) => {
+  res.json({ message: "Hello!!!!!" });
+});
