@@ -4,5 +4,12 @@
   "description": "Backend server for lenxt app",
   "main": "index.js",
   "author": "Rishabh Singh",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^6.0.14"
+  }
 }
