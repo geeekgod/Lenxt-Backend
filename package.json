@@ -1,0 +1,8 @@
+{
+  "name": "lenxt-server",
+  "version": "1.0.0",
+  "description": "Backend server for lenxt app",
+  "main": "index.js",
+  "author": "Rishabh Singh",
+  "license": "ISC"
+}
