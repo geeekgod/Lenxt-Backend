@@ -1,12 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-router.get("/signup", async (req, res) => {
-  res.json({ message: "This is the Sign-up route" });
-});
+const authController = require("../controllers/authController");
 
-router.get("/signin", async (req, res) => {
-  res.json({ message: "This is the Sign-in route" });
-});
+router.post("/signup", authController.signupController);
+
+router.post("/signin", authController.signinController);
 
 module.exports = router;
