@@ -50,7 +50,28 @@ const sendOtp = (req, res) => {
   });
 };
 
+const validateOtp = (req, res) => {
+  const otpDat = {
+    email: req.body.email,
+    otp: parseInt(req.body.otp),
+  };
+  Otp.findOne({ email: otpDat.email }).then((resUser) => {
+    if (resUser) {
+      if (otpDat.otp === resUser.otp) {
+        console.log("otp validated success");
+        res.json({ msg: "otp validated success" });
+      } else {
+        console.log("otp not valid");
+        res.json({ msg: "otp not valid" });
+      }
+      console.log(resUser);
+    } else {
+      res.json({ msg: "user not present" });
+    }
+  });
+};
 module.exports = {
   userPresentCheck,
   sendOtp,
+  validateOtp,
 };
