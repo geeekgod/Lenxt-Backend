@@ -2,6 +2,7 @@ const User = require("../models/user");
 const Otp = require("../models/otp");
 const otpGen = require("../utils/otpGen");
 const sendOtpToMail = require("./otpMailer");
+const bcrypt = require("bcrypt");
 
 const userPresentCheck = (req, res) => {
   User.findOne({ email: req.body.email })
@@ -58,10 +59,8 @@ const validateOtp = (req, res) => {
   Otp.findOne({ email: otpDat.email }).then((resUser) => {
     if (resUser) {
       if (otpDat.otp === resUser.otp) {
-        console.log("otp validated success");
         res.json({ msg: "otp validated success" });
       } else {
-        console.log("otp not valid");
         res.json({ msg: "otp not valid" });
       }
       console.log(resUser);
@@ -70,8 +69,52 @@ const validateOtp = (req, res) => {
     }
   });
 };
+
+const resetPass = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const otp = parseInt(req.body.otp);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    User.findOne({ email: email }).then((userRes) => {
+      if (userRes) {
+        Otp.findOne({ email: email }).then((resUser) => {
+          if (resUser) {
+            if (otp === resUser.otp) {
+              User.findOneAndUpdate(
+                { email: email },
+                { $set: { password: hashedPassword } },
+                { new: true },
+                (err, doc) => {
+                  if (err) {
+                    res.json({ msg: "somenthing went wrong" });
+                  }
+                  res.json({ msg: "password reset successfull" });
+                  Otp.deleteOne({ email: email }, (err) => {
+                    console.log(err);
+                  });
+                }
+              );
+            } else {
+              res.json({ msg: "otp not valid" });
+            }
+            console.log(resUser);
+          } else {
+            res.json({ msg: "otp not present" });
+          }
+        });
+      } else {
+        res.json({ msg: "user not found" });
+      }
+    });
+  } catch (err) {
+    res.json({ err: "err" }).status(500);
+    console.log(err);
+  }
+};
 module.exports = {
   userPresentCheck,
   sendOtp,
   validateOtp,
+  resetPass,
 };
