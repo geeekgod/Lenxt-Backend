@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 // const User = require("./models/users");
 
 const authRouter = require("./routes/authRouter");
+const resetPassRouter = require("./routes/resetPassRouter");
 
 // Config Dot env to access env's
 dotenv.config();
@@ -43,6 +44,7 @@ app.get("/", (req, res) => {
 
 // auth Routes
 app.use("/auth", authRouter);
+app.use("/reset-pass", resetPassRouter);
 
 app.get("/test", (req, res) => {
   res.json({ message: "Hello!!!!!" });
