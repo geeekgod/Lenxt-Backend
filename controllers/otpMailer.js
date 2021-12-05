@@ -2,6 +2,7 @@ const nodemailer = require("nodemailer");
 
 const sendOtpToMail = (req, res, otp) => {
   {
+    console.log(process.env.MAILER_EMAIL, process.env.MAILER_PASSWORD);
     const output = `
         <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
         <div style="margin:50px auto;width:70%;padding:20px 0">
