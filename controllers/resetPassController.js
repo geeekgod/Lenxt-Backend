@@ -65,7 +65,7 @@ const validateOtp = (req, res) => {
       }
       console.log(resUser);
     } else {
-      res.json({ msg: "user not present" });
+      res.json({ msg: "otp not present" });
     }
   });
 };
