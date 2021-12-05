@@ -2,7 +2,6 @@ const nodemailer = require("nodemailer");
 
 const sendOtpToMail = (req, res, otp) => {
   {
-    console.log(process.env.MAILER_EMAIL, process.env.MAILER_PASSWORD);
     const output = `
         <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
         <div style="margin:50px auto;width:70%;padding:20px 0">
@@ -20,10 +19,9 @@ const sendOtpToMail = (req, res, otp) => {
         </div>
       </div>`;
     let transporter = nodemailer.createTransport({
-      service: "Gmail",
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      host: "smtp.zoho.in",
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.MAILER_EMAIL,
         pass: process.env.MAILER_PASSWORD,
@@ -34,7 +32,7 @@ const sendOtpToMail = (req, res, otp) => {
     });
 
     let mailOptions = {
-      from: '"Lenxt App" <notification@lenxt.app>',
+      from: `"Lenxt App" <${process.env.MAILER_EMAIL}>`,
       to: req.body.email,
       subject: "Password Reset OTP",
       html: output,
