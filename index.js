@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
@@ -24,9 +26,18 @@ mongoose
   .connect(dbURI)
   .then((res) => {
     // listen for requests
-    console.log("connected to db", res);
-    app.listen(port, () => {
-      console.log("\nServer is live on http://localhost:4500");
+    // console.log("connected to db", res);
+    // app.listen(port, () => {
+    //   console.log("\nServer is live on http://localhost:4500");
+    // });
+    const server = http.createServer(app);
+    const io = new Server(server, {
+      cors: {
+        origin: "*"
+      },
+    });
+    server.listen(port, () => {
+      console.log(`server listening on http://localhost:${port}`);
     });
   })
   .catch((err) => {
