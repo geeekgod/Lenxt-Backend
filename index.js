@@ -36,6 +36,15 @@ mongoose
         origin: "*"
       },
     });
+
+    io.on("connection", (socket) => {
+      console.log(socket.id);
+    
+      socket.on("disconnect", () => {
+        console.log(`User ${socket.id} disconnected`);
+      });
+    });
+    
     server.listen(port, () => {
       console.log(`server listening on http://localhost:${port}`);
     });
