@@ -6,10 +6,9 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
 // Models, Routes & Controllers
-// const User = require("./models/users");
-
 const authRouter = require("./routes/authRouter");
 const resetPassRouter = require("./routes/resetPassRouter");
+const User = require("./models/user");
 
 // Config Dot env to access env's
 dotenv.config();
@@ -25,26 +24,48 @@ const port = process.env.PORT || 4500;
 mongoose
   .connect(dbURI)
   .then((res) => {
-    // listen for requests
-    // console.log("connected to db", res);
-    // app.listen(port, () => {
-    //   console.log("\nServer is live on http://localhost:4500");
-    // });
     const server = http.createServer(app);
     const io = new Server(server, {
       cors: {
-        origin: "*"
+        origin: "*",
       },
     });
 
     io.on("connection", (socket) => {
       console.log(socket.id);
-    
+
+      socket.on("updateUser", (userId, accessToken) => {
+        User.findOne({ uid: userId, "access-token": accessToken }).then(
+          (uRes) => {
+            if (uRes) {
+              User.findOneAndUpdate(
+                { uid: userId },
+                { $set: { "socket-id": socket.id } },
+                { new: true },
+                (err, doc) => {
+                  if (err) {
+                    socket.emit(
+                      "updateUserMsg",
+                      `There was some Error while updating: ${userId}`
+                    );
+                  }
+                }
+              );
+            } else {
+              socket.emit(
+                "updateUserMsg",
+                `No user found please login: ${userId}`
+              );
+            }
+          }
+        );
+      });
+
       socket.on("disconnect", () => {
         console.log(`User ${socket.id} disconnected`);
       });
     });
-    
+
     server.listen(port, () => {
       console.log(`server listening on http://localhost:${port}`);
     });
