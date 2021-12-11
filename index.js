@@ -48,6 +48,11 @@ mongoose
                       "updateUserMsg",
                       `There was some Error while updating: ${userId}`
                     );
+                  } else {
+                    socket.emit(
+                      "updateUserMsg",
+                      `Successfully updated socket id: ${userId}`
+                    );
                   }
                 }
               );
@@ -63,6 +68,21 @@ mongoose
 
       socket.on("disconnect", () => {
         console.log(`User ${socket.id} disconnected`);
+        User.findOneAndUpdate(
+          { "socket-id": socket.id },
+          { $set: { "socket-id": " " } },
+          { new: true },
+          (err, doc) => {
+            if (err) {
+              console.log(err);
+            } else {
+              socket.emit(
+                "updateUserMsg",
+                `Successfully updated socket id: ${socket.id}`
+              );
+            }
+          }
+        );
       });
     });
 
