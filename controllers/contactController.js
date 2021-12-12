@@ -1,22 +1,44 @@
 const User = require("../models/user");
 const Contact = require("../models/Contacts");
 
+const contactShredder = async (resContacts, newResContacts) => {
+  for (var i = 0; i < resContacts.length; i++) {
+    let newContact = {
+      _id: resContacts[i]._id,
+      members: resContacts[i].members,
+    };
+    newResContacts = [...newResContacts, newContact];
+  }
+  return newResContacts;
+};
+
 const listContacts = (req, res) => {
   reqUid = req.headers.uid;
   reqAccToken = req.headers["access-token"];
-  User.findOne({ uid: reqUid, "access-token": reqAccToken }).then((resUser) => {
-    if (resUser) {
-      Contact.find({ members: parseInt(reqUid) })
-        .then((resContacts) => {
-          res.json({ contacts: resContacts });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      res.json({ msg: "user not found please authenticate" });
-    }
-  });
+  User.findOne({ uid: reqUid, "access-token": reqAccToken })
+    .then((resUser) => {
+      if (resUser) {
+        Contact.find({ members: resUser._id })
+          .then((resContacts) => {
+            let newResContacts = [];
+            contactShredder(resContacts, newResContacts)
+              .then((finalContacts) => {
+                res.json({ contacts: finalContacts });
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
+        res.json({ msg: "user not found please authenticate" });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 const addToContacts = (req, res) => {
@@ -29,12 +51,12 @@ const addToContacts = (req, res) => {
         User.findOne({ email: reqClientMail }).then((resClient) => {
           if (resClient) {
             Contact.findOne({
-              members: [parseInt(reqUid), resClient.uid],
+              members: [resUser._id, resClient._id],
             }).then((resExContact) => {
               if (resExContact) {
                 res.json({ msg: "contact already present" });
               } else {
-                Contact.create({ members: [parseInt(reqUid), resClient.uid] })
+                Contact.create({ members: [resUser._id, resClient._id] })
                   .then((resContacts) => {
                     if (resContacts) {
                       res.json({ msg: "contact created" });
