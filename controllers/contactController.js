@@ -14,7 +14,7 @@ const listContacts = (req, res) => {
           console.log(err);
         });
     } else {
-      res.json({ msg: "user not found" });
+      res.json({ msg: "user not found please authenticate" });
     }
   });
 };
@@ -23,12 +23,14 @@ const addToContacts = (req, res) => {
   reqUid = req.headers.uid;
   reqAccToken = req.headers["access-token"];
   reqClientMail = req.body.email;
-  User.findOne({ uid: reqUid, "access-token": reqAccToken }).then((resUser) => {
-    if (resUser) {
-      User.findOne({ email: reqClientMail }).then((resClient) => {
-        if (resClient) {
-          Contact.findOne({ members: [parseInt(reqUid), resClient.uid] }).then(
-            (resExContact) => {
+  User.findOne({ uid: reqUid, "access-token": reqAccToken })
+    .then((resUser) => {
+      if (resUser) {
+        User.findOne({ email: reqClientMail }).then((resClient) => {
+          if (resClient) {
+            Contact.findOne({
+              members: [parseInt(reqUid), resClient.uid],
+            }).then((resExContact) => {
               if (resExContact) {
                 res.json({ msg: "contact already present" });
               } else {
@@ -40,16 +42,18 @@ const addToContacts = (req, res) => {
                   })
                   .catch((err) => console.log(err));
               }
-            }
-          );
-        } else {
-          res.json({ msg: "client not found" });
-        }
-      });
-    } else {
-      res.json({ msg: "user not found please authenticate" });
-    }
-  });
+            });
+          } else {
+            res.json({ msg: "client not found" });
+          }
+        });
+      } else {
+        res.json({ msg: "user not found please authenticate" });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 module.exports = { listContacts, addToContacts };
