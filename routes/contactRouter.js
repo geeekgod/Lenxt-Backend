@@ -5,4 +5,6 @@ const contactController = require("../controllers/contactController");
 
 router.get("/", contactController.listContacts);
 
+router.post("/addNew", contactController.addToContacts);
+
 module.exports = router;
