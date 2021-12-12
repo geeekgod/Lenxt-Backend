@@ -6,7 +6,6 @@ const profiler = async (profRes, profiles) => {
       _id: profRes[i]._id,
       name: profRes[i].name,
       email: profRes[i].email,
-      uid: profRes[i].uid,
       "socket-id": profRes[i]["socket-id"],
     };
     profiles = [...profiles, newProf];
@@ -49,7 +48,6 @@ const listMe = (req, res) => {
           _id: resUser._id,
           name: resUser.name,
           email: resUser.email,
-          uid: resUser.uid,
           "socket-id": resUser["socket-id"],
         };
         res.json({ profile: newProf });
