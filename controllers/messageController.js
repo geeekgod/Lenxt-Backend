@@ -36,13 +36,13 @@ const addMessage = (req, res) => {
     .then((resUser) => {
       if (resUser) {
         Message.findOne({
-          members: { $in: [resUser.email, clientMail] },
+          members: { $all: [resUser.email, clientMail] },
         }).then((respMsg) => {
           if (respMsg) {
             respMsg.messages.push(reqMsgData);
             let newMsg = respMsg.messages;
             Message.findOneAndUpdate(
-              { members: { $in: [resUser.email, clientMail] } },
+              { members: { $all: [resUser.email, clientMail] } },
               { $set: { messages: newMsg } },
               { new: true },
               (err, doc) => {

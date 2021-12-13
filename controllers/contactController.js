@@ -56,9 +56,10 @@ const addToContacts = (req, res) => {
           User.findOne({ email: reqClientMail }).then((resClient) => {
             if (resClient) {
               Contact.findOne({
-                members: { $in: [resUser.email, resClient.email] },
+                members: { $all: [reqClientMail, resUser.email] },
               }).then((resExContact) => {
                 if (resExContact) {
+                  console.log(resExContact, resUser.email);
                   res.json({ msg: "contact already present" });
                 } else {
                   Contact.create({ members: [resUser.email, resClient.email] })
