@@ -35,30 +35,30 @@ const addMessage = (req, res) => {
   User.findOne({ uid: reqUid, "access-token": reqAccToken })
     .then((resUser) => {
       if (resUser) {
-        Message.findOne({ members: [resUser.email, clientMail] }).then(
-          (respMsg) => {
-            if (respMsg) {
-              respMsg.messages.push(reqMsgData);
-              let newMsg = respMsg.messages;
-              Message.findOneAndUpdate(
-                { members: [resUser.email, clientMail] },
-                { $set: { messages: newMsg } },
-                { new: true },
-                (err, doc) => {
-                  if (err) {
-                    res.json({ msg: "somenthing went wrong" });
-                  }
-                  console.log(doc);
-                  res.json({ msg: "message added" });
+        Message.findOne({
+          members: { $in: [resUser.email, clientMail] },
+        }).then((respMsg) => {
+          if (respMsg) {
+            respMsg.messages.push(reqMsgData);
+            let newMsg = respMsg.messages;
+            Message.findOneAndUpdate(
+              { members: [resUser.email, clientMail] },
+              { $set: { messages: newMsg } },
+              { new: true },
+              (err, doc) => {
+                if (err) {
+                  res.json({ msg: "somenthing went wrong" });
                 }
-              ).catch((err) => {
-                console.log(err);
-              });
-            } else {
-              res.json({ msg: "message not added" });
-            }
+                console.log(doc);
+                res.json({ msg: "message added" });
+              }
+            ).catch((err) => {
+              console.log(err);
+            });
+          } else {
+            res.json({ msg: "message not added" });
           }
-        );
+        });
       } else {
         res.json({ msg: "user not found please authenticate" });
       }
