@@ -10,6 +10,7 @@ const authRouter = require("./routes/authRouter");
 const resetPassRouter = require("./routes/resetPassRouter");
 const contactRouter = require("./routes/contactRouter");
 const profileRouter = require("./routes/profileRouter");
+const messagesRouter = require("./routes/messagesRouter");
 const User = require("./models/user");
 
 // Config Dot env to access env's
@@ -110,6 +111,7 @@ app.use("/auth", authRouter);
 app.use("/reset-pass", resetPassRouter);
 app.use("/contacts", contactRouter);
 app.use("/profiles", profileRouter);
+app.use("/messages", messagesRouter);
 
 app.get("/test", (req, res) => {
   res.json({ message: "Hello!!!!!" });

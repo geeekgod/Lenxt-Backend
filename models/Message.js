@@ -5,14 +5,9 @@ const MessageSchema = new mongoose.Schema(
     members: {
       type: Array,
     },
-    messages: [
-      {
-        id: Number,
-        name: String,
-        message: String,
-        time: String,
-      },
-    ],
+    messages: {
+      type: Array,
+    },
   },
   {
     timestamps: true,
