@@ -31,16 +31,17 @@ const addMessage = (req, res) => {
   reqUid = req.headers.uid;
   reqAccToken = req.headers["access-token"];
   reqMsgData = req.body.msgData;
+  clientId = req.body.clientId;
   User.findOne({ uid: reqUid, "access-token": reqAccToken })
     .then((resUser) => {
       if (resUser) {
-        Message.findOne({ members: [resUser._id, reqMsgData.id] }).then(
+        Message.findOne({ members: [resUser._id, clientId] }).then(
           (respMsg) => {
             if (respMsg) {
               respMsg.messages.push(reqMsgData);
               let newMsg = respMsg.messages;
               Message.findOneAndUpdate(
-                { members: [resUser._id, reqMsgData.id] },
+                { members: [resUser._id, clientId] },
                 { $set: { messages: newMsg } },
                 { new: true },
                 (err, doc) => {
