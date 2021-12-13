@@ -20,7 +20,6 @@ const listContacts = (req, res) => {
     .then((resUser) => {
       if (resUser) {
         userMail = resUser.email;
-        console.log(userId);
         Contact.find({ members: userMail })
           .then((resContacts) => {
             let newResContacts = [];
