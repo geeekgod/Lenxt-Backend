@@ -19,7 +19,9 @@ const listContacts = (req, res) => {
   User.findOne({ uid: reqUid, "access-token": reqAccToken })
     .then((resUser) => {
       if (resUser) {
-        Contact.find({ members: resUser._id })
+        userMail = resUser.email;
+        console.log(userId);
+        Contact.find({ members: userMail })
           .then((resContacts) => {
             let newResContacts = [];
             contactShredder(resContacts, newResContacts)
@@ -45,23 +47,23 @@ const listContacts = (req, res) => {
 const addToContacts = (req, res) => {
   reqUid = req.headers.uid;
   reqAccToken = req.headers["access-token"];
-  reqClientMail = req.body.email;
+  reqClientMail = req.body.clientMail;
   User.findOne({ uid: reqUid, "access-token": reqAccToken })
     .then((resUser) => {
       if (resUser) {
         User.findOne({ email: reqClientMail }).then((resClient) => {
           if (resClient) {
             Contact.findOne({
-              members: [resUser._id, resClient._id],
+              members: [resUser.email, resClient.email],
             }).then((resExContact) => {
               if (resExContact) {
                 res.json({ msg: "contact already present" });
               } else {
-                Contact.create({ members: [resUser._id, resClient._id] })
+                Contact.create({ members: [resUser.email, resClient.email] })
                   .then((resContacts) => {
                     if (resContacts) {
                       Message.create({
-                        members: [resUser._id, resClient._id],
+                        members: [resUser.email, resClient.email],
                         messages: [],
                       })
                         .then((finContact) => {

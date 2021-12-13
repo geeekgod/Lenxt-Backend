@@ -7,7 +7,7 @@ const listMessages = (req, res) => {
   User.findOne({ uid: reqUid, "access-token": reqAccToken })
     .then((resUser) => {
       if (resUser) {
-        Message.find({ members: resUser._id })
+        Message.find({ members: resUser.email })
           .then((resMessages) => {
             if (resMessages) {
               res.json({ messages: resMessages });
@@ -31,17 +31,17 @@ const addMessage = (req, res) => {
   reqUid = req.headers.uid;
   reqAccToken = req.headers["access-token"];
   reqMsgData = req.body.msgData;
-  clientId = req.body.clientId;
+  clientMail = req.body.clientMail;
   User.findOne({ uid: reqUid, "access-token": reqAccToken })
     .then((resUser) => {
       if (resUser) {
-        Message.findOne({ members: [resUser._id, clientId] }).then(
+        Message.findOne({ members: [resUser.email, clientMail] }).then(
           (respMsg) => {
             if (respMsg) {
               respMsg.messages.push(reqMsgData);
               let newMsg = respMsg.messages;
               Message.findOneAndUpdate(
-                { members: [resUser._id, clientId] },
+                { members: [resUser.email, clientMail] },
                 { $set: { messages: newMsg } },
                 { new: true },
                 (err, doc) => {
@@ -54,6 +54,8 @@ const addMessage = (req, res) => {
               ).catch((err) => {
                 console.log(err);
               });
+            } else {
+              res.json({ msg: "message not added" });
             }
           }
         );
