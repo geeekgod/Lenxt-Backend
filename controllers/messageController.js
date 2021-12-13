@@ -42,7 +42,7 @@ const addMessage = (req, res) => {
             respMsg.messages.push(reqMsgData);
             let newMsg = respMsg.messages;
             Message.findOneAndUpdate(
-              { members: [resUser.email, clientMail] },
+              { members: { $in: [resUser.email, clientMail] } },
               { $set: { messages: newMsg } },
               { new: true },
               (err, doc) => {
