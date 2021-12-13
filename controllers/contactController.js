@@ -50,38 +50,42 @@ const addToContacts = (req, res) => {
   User.findOne({ uid: reqUid, "access-token": reqAccToken })
     .then((resUser) => {
       if (resUser) {
-        User.findOne({ email: reqClientMail }).then((resClient) => {
-          if (resClient) {
-            Contact.findOne({
-              members: { $in: [resUser.email, resClient.email] },
-            }).then((resExContact) => {
-              if (resExContact) {
-                res.json({ msg: "contact already present" });
-              } else {
-                Contact.create({ members: [resUser.email, resClient.email] })
-                  .then((resContacts) => {
-                    if (resContacts) {
-                      Message.create({
-                        members: [resUser.email, resClient.email],
-                        messages: [],
-                      })
-                        .then((finContact) => {
-                          if (finContact) {
-                            res.json({ msg: "contact created" });
-                          }
+        if (resUser.email === reqClientMail) {
+          res.json({ msg: "not you mail" });
+        } else {
+          User.findOne({ email: reqClientMail }).then((resClient) => {
+            if (resClient) {
+              Contact.findOne({
+                members: { $in: [resUser.email, resClient.email] },
+              }).then((resExContact) => {
+                if (resExContact) {
+                  res.json({ msg: "contact already present" });
+                } else {
+                  Contact.create({ members: [resUser.email, resClient.email] })
+                    .then((resContacts) => {
+                      if (resContacts) {
+                        Message.create({
+                          members: [resUser.email, resClient.email],
+                          messages: [],
                         })
-                        .catch((err) => {
-                          console.log(err);
-                        });
-                    }
-                  })
-                  .catch((err) => console.log(err));
-              }
-            });
-          } else {
-            res.json({ msg: "client not found" });
-          }
-        });
+                          .then((finContact) => {
+                            if (finContact) {
+                              res.json({ msg: "contact created" });
+                            }
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                          });
+                      }
+                    })
+                    .catch((err) => console.log(err));
+                }
+              });
+            } else {
+              res.json({ msg: "client not found" });
+            }
+          });
+        }
       } else {
         res.json({ msg: "user not found please authenticate" });
       }
