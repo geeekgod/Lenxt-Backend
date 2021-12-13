@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Contact = require("../models/Contacts");
+const Message = require("../models/Message");
 
 const contactShredder = async (resContacts, newResContacts) => {
   for (var i = 0; i < resContacts.length; i++) {
@@ -59,7 +60,18 @@ const addToContacts = (req, res) => {
                 Contact.create({ members: [resUser._id, resClient._id] })
                   .then((resContacts) => {
                     if (resContacts) {
-                      res.json({ msg: "contact created" });
+                      Message.create({
+                        members: [resUser._id, resClient._id],
+                        messages: [],
+                      })
+                        .then((finContact) => {
+                          if (finContact) {
+                            res.json({ msg: "contact created" });
+                          }
+                        })
+                        .catch((err) => {
+                          console.log(err);
+                        });
                     }
                   })
                   .catch((err) => console.log(err));
