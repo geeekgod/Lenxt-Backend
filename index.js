@@ -12,6 +12,7 @@ const contactRouter = require("./routes/contactRouter");
 const profileRouter = require("./routes/profileRouter");
 const messagesRouter = require("./routes/messagesRouter");
 const User = require("./models/user");
+const Message = require("./models/Message");
 
 // Config Dot env to access env's
 dotenv.config();
@@ -35,8 +36,6 @@ mongoose
     });
 
     io.on("connection", (socket) => {
-      console.log(socket.id);
-
       socket.on("updateUser", (userId, accessToken) => {
         User.findOne({ uid: userId, "access-token": accessToken }).then(
           (uRes) => {
@@ -69,8 +68,76 @@ mongoose
         );
       });
 
+      socket.on("send_message", (data) => {
+        reqUid = data.headers.uid;
+        reqAccToken = data.headers["access-token"];
+        reqMsgData = data.body.msgData;
+        clientMail = data.body.clientMail;
+        User.findOne({ uid: reqUid, "access-token": reqAccToken })
+          .then((resUser) => {
+            if (resUser) {
+              Message.findOne({
+                members: { $all: [resUser.email, clientMail] },
+              }).then((respMsg) => {
+                if (respMsg) {
+                  User.findOne({ email: clientMail }).then((clientUser) => {
+                    if (clientUser) {
+                      if (clientUser["socket-id"] !== " ") {
+                        socket
+                          .to(clientUser["socket-id"])
+                          .emit("receive_message", { data: reqMsgData });
+                      }
+                      socket.emit("message_sent", {
+                        msg: "message added",
+                        data: { data: reqMsgData, clientMail: clientMail },
+                      });
+                    } else {
+                      socket
+                        .to(resUser["socket-id"])
+                        .emit("message_sent", { msg: "message not added" });
+                    }
+                  });
+                } else {
+                  socket
+                    .to(resUser["socket-id"])
+                    .emit("message_sent", { msg: "message not added" });
+                }
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+
+      socket.on("addContact", (data) => {
+        reqUid = data.headers.uid;
+        reqAccToken = data.headers["access-token"];
+        clientMail = data.body.clientMail;
+        User.findOne({ uid: reqUid, "access-token": reqAccToken })
+          .then((resUser) => {
+            if (resUser) {
+              User.findOne({ email: clientMail })
+                .then((clientUser) => {
+                  if (clientUser) {
+                    if (clientUser["socket-id"] !== " ") {
+                      socket
+                        .to(clientUser["socket-id"])
+                        .emit("receive_contacts", { msg: "load_contacts" });
+                    }
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+
       socket.on("disconnect", () => {
-        console.log(`User ${socket.id} disconnected`);
         User.findOneAndUpdate(
           { "socket-id": socket.id },
           { $set: { "socket-id": " " } },

@@ -39,8 +39,9 @@ const addMessage = (req, res) => {
           members: { $all: [resUser.email, clientMail] },
         }).then((respMsg) => {
           if (respMsg) {
-            respMsg.messages.push(reqMsgData);
             let newMsg = respMsg.messages;
+            newMsg.push(reqMsgData);
+            newMsg = respMsg.messages;
             Message.findOneAndUpdate(
               { members: { $all: [resUser.email, clientMail] } },
               { $set: { messages: newMsg } },
@@ -49,7 +50,6 @@ const addMessage = (req, res) => {
                 if (err) {
                   res.json({ msg: "somenthing went wrong" });
                 }
-                console.log(doc);
                 res.json({ msg: "message added" });
               }
             ).catch((err) => {
