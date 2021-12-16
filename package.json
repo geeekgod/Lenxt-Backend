@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Backend server for lenxt app",
   "main": "index.js",
-  "author": "Rishabh Singh",
-  "license": "ISC",
+  "author": {
+    "name": "Rishabh Singh",
+    "email": "ris8645208@gmail.com"
+  },
+  "license": "MIT",
   "scripts": {
     "start": "node index.js",
     "devStart": "nodemon index.js"
